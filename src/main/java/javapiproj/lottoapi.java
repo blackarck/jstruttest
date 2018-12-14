@@ -36,6 +36,7 @@ public class lottoapi {
         return "Hello run World!";
     }
 
+    @CrossOrigin(origins = "http://localhost:4200")
     @RequestMapping(path = "/api")
     public String getlotto(@RequestParam("persname") String persname) {
         l=new lottoservice();
