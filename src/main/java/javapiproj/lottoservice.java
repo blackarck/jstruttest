@@ -12,8 +12,18 @@ import org.json.simple.JSONObject;
 
 public class lottoservice {
 
+    String uid = "javadmin";
+    String pwd = "password";
+    Connection con;
+
     lottoservice() {
         System.out.println("Constructor");
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test", uid, pwd);
+        } catch (Exception e) {
+            System.out.println("Error constructor" + e);
+        }
     }
 
     String getname(String name) {
@@ -50,7 +60,7 @@ public class lottoservice {
             Date date = new Date();
             SimpleDateFormat ft1 = new SimpleDateFormat("yyyy-MM-dd");
             String dt = ft1.format(date);
-            prepqry = "insert into lottoissue values ('" + name + "','" + nextlottono + "','" + dt + "')";
+            prepqry = "insert into lottoissue values ('" + name + "','" + nextlottono + "','" + dt + ",0')";
             int returnval = executeqry(prepqry);
             prepqry = "update t_last_lotto set lastlotto='" + nextlottono + "'";
             returnval = executeqry(prepqry);
@@ -86,7 +96,7 @@ public class lottoservice {
         ResultSet rs = null;
         try {
             Class.forName("com.mysql.jdbc.Driver");
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test", "", "");
+            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test", uid, pwd);
             //here sonoo is database name, root is username and password  
             Statement stmt = con.createStatement();
             rs = stmt.executeQuery(qryString);
@@ -98,7 +108,7 @@ public class lottoservice {
             // con.close();
 
         } catch (Exception e) {
-            System.out.println(e);
+            System.out.println("Error runQry-" + e);
         }
         return rs;
     }//end of executeqry
@@ -108,13 +118,13 @@ public class lottoservice {
 
         try {
             Class.forName("com.mysql.jdbc.Driver");
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test", "", "");
+            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test", uid, pwd);
             //here sonoo is database name, root is username and password  
             Statement stmt = con.createStatement();
             returnint = stmt.executeUpdate(prepqry);
 
         } catch (Exception e) {
-            System.out.println(e);
+            System.out.println("error executeqry " + e);
         }
         return returnint;
     }//end of executeqry
