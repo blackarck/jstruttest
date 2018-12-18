@@ -12,18 +12,8 @@ import org.json.simple.JSONObject;
 
 public class lottoservice {
 
-    String uid = "javadmin";
-    String pwd = "password";
-    Connection con;
-
     lottoservice() {
         System.out.println("Constructor");
-        try {
-            Class.forName("com.mysql.jdbc.Driver");
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test", uid, pwd);
-        } catch (Exception e) {
-            System.out.println("Error constructor" + e);
-        }
     }
 
     String getname(String name) {
@@ -40,7 +30,7 @@ public class lottoservice {
         return retstr;
     }
 
-    String getlotdtls(String name) {
+    JSONArray getlotdtls(String name, Boolean buyval) {
 
         String retstr = "";
         //find the maximum issued lotto count 
@@ -50,21 +40,21 @@ public class lottoservice {
         try {
             while (rs.next()) {
                 System.out.println(rs.getInt(1));
-
                 nextlottono = Integer.parseInt(rs.getString(1));
                 nextlottono++;
-
             }
 
             //insert nextlotto in 
             Date date = new Date();
             SimpleDateFormat ft1 = new SimpleDateFormat("yyyy-MM-dd");
             String dt = ft1.format(date);
-            prepqry = "insert into lottoissue values ('" + name + "','" + nextlottono + "','" + dt + ",0')";
-            int returnval = executeqry(prepqry);
-            prepqry = "update t_last_lotto set lastlotto='" + nextlottono + "'";
-            returnval = executeqry(prepqry);
-            System.out.println(" return value after insertion " + returnval);
+            if (buyval) {
+                prepqry = "insert into lottoissue values ('" + name + "','" + nextlottono + "','" + dt + "','Pending','')";
+                int returnval = executeqry(prepqry);
+                prepqry = "update t_last_lotto set lastlotto='" + nextlottono + "'";
+                returnval = executeqry(prepqry);
+                System.out.println(" return value after insertion " + returnval);
+            }
             prepqry = "select * from lottoissue where name='" + name + "'";
             rs = runQry(prepqry);
 
@@ -96,7 +86,7 @@ public class lottoservice {
         ResultSet rs = null;
         try {
             Class.forName("com.mysql.jdbc.Driver");
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test", uid, pwd);
+            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test", "", "");
             //here sonoo is database name, root is username and password  
             Statement stmt = con.createStatement();
             rs = stmt.executeQuery(qryString);
@@ -108,7 +98,7 @@ public class lottoservice {
             // con.close();
 
         } catch (Exception e) {
-            System.out.println("Error runQry-" + e);
+            System.out.println(e);
         }
         return rs;
     }//end of executeqry
@@ -118,18 +108,18 @@ public class lottoservice {
 
         try {
             Class.forName("com.mysql.jdbc.Driver");
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test", uid, pwd);
+            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test", "", "");
             //here sonoo is database name, root is username and password  
             Statement stmt = con.createStatement();
             returnint = stmt.executeUpdate(prepqry);
 
         } catch (Exception e) {
-            System.out.println("error executeqry " + e);
+            System.out.println(e);
         }
         return returnint;
     }//end of executeqry
 
-    String resultsettojson(ResultSet resultSet) {
+    JSONArray resultsettojson(ResultSet resultSet) {
         String returnstr = "";
         JSONObject jsonobject = null;
         JSONArray jsonArray = new JSONArray();
@@ -140,7 +130,7 @@ public class lottoservice {
                 jsonobject = new JSONObject();
 
                 for (int i = 0; i < metaData.getColumnCount(); i++) {
-                    jsonobject.put(metaData.getColumnLabel(i + 1), resultSet.getObject(i + 1));
+                    jsonobject.put(metaData.getColumnLabel(i + 1), resultSet.getString(i + 1));
                 }
                 jsonArray.add(jsonobject);
             }
@@ -151,7 +141,8 @@ public class lottoservice {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return returnstr;
+       // return returnstr;
+          return jsonArray;
     }
 
 }//end of class
