@@ -30,7 +30,7 @@ public class lottoservice {
         return retstr;
     }
 
-    String getlotdtls(String name) {
+    JSONArray getlotdtls(String name, Boolean buyval) {
 
         String retstr = "";
         //find the maximum issued lotto count 
@@ -40,21 +40,21 @@ public class lottoservice {
         try {
             while (rs.next()) {
                 System.out.println(rs.getInt(1));
-
                 nextlottono = Integer.parseInt(rs.getString(1));
                 nextlottono++;
-
             }
 
             //insert nextlotto in 
             Date date = new Date();
             SimpleDateFormat ft1 = new SimpleDateFormat("yyyy-MM-dd");
             String dt = ft1.format(date);
-            prepqry = "insert into lottoissue values ('" + name + "','" + nextlottono + "','" + dt + "')";
-            int returnval = executeqry(prepqry);
-            prepqry = "update t_last_lotto set lastlotto='" + nextlottono + "'";
-            returnval = executeqry(prepqry);
-            System.out.println(" return value after insertion " + returnval);
+            if (buyval) {
+                prepqry = "insert into lottoissue values ('" + name + "','" + nextlottono + "','" + dt + "','Pending','')";
+                int returnval = executeqry(prepqry);
+                prepqry = "update t_last_lotto set lastlotto='" + nextlottono + "'";
+                returnval = executeqry(prepqry);
+                System.out.println(" return value after insertion " + returnval);
+            }
             prepqry = "select * from lottoissue where name='" + name + "'";
             rs = runQry(prepqry);
 
@@ -119,7 +119,7 @@ public class lottoservice {
         return returnint;
     }//end of executeqry
 
-    String resultsettojson(ResultSet resultSet) {
+    JSONArray resultsettojson(ResultSet resultSet) {
         String returnstr = "";
         JSONObject jsonobject = null;
         JSONArray jsonArray = new JSONArray();
@@ -130,7 +130,7 @@ public class lottoservice {
                 jsonobject = new JSONObject();
 
                 for (int i = 0; i < metaData.getColumnCount(); i++) {
-                    jsonobject.put(metaData.getColumnLabel(i + 1), resultSet.getObject(i + 1));
+                    jsonobject.put(metaData.getColumnLabel(i + 1), resultSet.getString(i + 1));
                 }
                 jsonArray.add(jsonobject);
             }
@@ -141,7 +141,8 @@ public class lottoservice {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return returnstr;
+       // return returnstr;
+          return jsonArray;
     }
 
 }//end of class
