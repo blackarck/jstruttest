@@ -5,6 +5,7 @@
  */
 package javapiproj;
 
+import org.json.simple.JSONArray;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -38,10 +39,10 @@ public class lottoapi {
 
     @CrossOrigin(origins = "http://localhost:4200")
     @RequestMapping(path = "/api")
-    public String getlotto(@RequestParam("persname") String persname) {
+    public JSONArray getlotto(@RequestParam("persname") String persname,@RequestParam("buyval") Boolean buyval) {
         l=new lottoservice();
-        System.out.println("Input param is " + persname);
-        String getval=l.getlotdtls(persname);
+        System.out.println("Input param is " + persname + " buy val "+buyval);
+        JSONArray getval=l.getlotdtls(persname,buyval);
         return getval;
     }
     
