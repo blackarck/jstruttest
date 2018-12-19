@@ -12,6 +12,9 @@ import org.json.simple.JSONObject;
 
 public class lottoservice {
 
+    String uid = "javadmin";
+    String pwd = "password";
+    
     lottoservice() {
         System.out.println("Constructor");
     }
@@ -49,7 +52,15 @@ public class lottoservice {
             SimpleDateFormat ft1 = new SimpleDateFormat("yyyy-MM-dd");
             String dt = ft1.format(date);
             if (buyval) {
-                prepqry = "insert into lottoissue values ('" + name + "','" + nextlottono + "','" + dt + "','Pending','')";
+                String schedidval="";
+                //find out the schedid to which these will go
+                prepqry="SELECT schedid FROM scheddtl WHERE schdstatus='Pending' and rundttm =(select min(rundttm) from scheddtl where rundttm>CURRENT_TIMESTAMP)";
+                
+                rs=runQry(prepqry);
+                while(rs.next()){
+                    schedidval=rs.getString(1);
+                }
+                prepqry = "insert into lottoissue (name,lottono,issuedt,status,schedid) values  ('" + name + "','" + nextlottono + "','" + dt + "','Pending','" + schedidval+"')";
                 int returnval = executeqry(prepqry);
                 prepqry = "update t_last_lotto set lastlotto='" + nextlottono + "'";
                 returnval = executeqry(prepqry);
@@ -86,7 +97,7 @@ public class lottoservice {
         ResultSet rs = null;
         try {
             Class.forName("com.mysql.jdbc.Driver");
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test", "", "");
+            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test",uid,pwd);
             //here sonoo is database name, root is username and password  
             Statement stmt = con.createStatement();
             rs = stmt.executeQuery(qryString);
@@ -108,7 +119,7 @@ public class lottoservice {
 
         try {
             Class.forName("com.mysql.jdbc.Driver");
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test", "", "");
+            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test", uid,pwd);
             //here sonoo is database name, root is username and password  
             Statement stmt = con.createStatement();
             returnint = stmt.executeUpdate(prepqry);
