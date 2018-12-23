@@ -27,12 +27,13 @@ public class lottoapi {
     @CrossOrigin(origins = "http://localhost:4200")
     @RequestMapping(path = "/lottoget")
     String home() {
-        return "Hello World!";
+        return "Hello World! cors enabled";
     }
 
+    @CrossOrigin(origins = "http://localhost:9900")
     @RequestMapping(path = "/lottorun")
     String home1() {
-        return "Hello run World!";
+        return "Hello run World! cors disabled";
     }
 
     @CrossOrigin(origins = "http://localhost:4200")
