@@ -51,6 +51,8 @@ public class lottoservice {
             Date date = new Date();
             SimpleDateFormat ft1 = new SimpleDateFormat("yyyy-MM-dd");
             String dt = ft1.format(date);
+          
+             
             if (buyval) {
                 String schedidval="";
                 //find out the schedid to which these will go
@@ -66,7 +68,8 @@ public class lottoservice {
                 returnval = executeqry(prepqry);
                 System.out.println(" return value after insertion " + returnval);
             }
-            prepqry = "select * from lottoissue where name='" + name + "'";
+           //prepqry = "select * from lottoissue where name='" + name + "'";
+           prepqry = "select name,lottono,issuedt,status, concat(STR_TO_DATE (substring(schedid,1,8),'%d%m%Y') ,':' , substring(schedid,9,2),':00') as schedid from lottoissue where name='" + name + "'";
             rs = runQry(prepqry);
 
         } catch (Exception e) {
